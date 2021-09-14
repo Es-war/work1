@@ -70,8 +70,8 @@ def init_map():
     for letter in AL_PY:
         map_cnt += 1
         alp_py_map[letter] = map_cnt
-
-
+        
+        
 def produce_words(word):
     global map_cnt
     word = list(word)
@@ -126,21 +126,61 @@ def produce_words(word):
                 sensitive_word.append([character])
             else:
                 sensitive_word[0].append(character)
-    print(sensitive_word)
     return sensitive_word
 
 
+def word2num(word):
+    # 用数字表征敏感词
+    word_list = []
+    for each in word:
+        if each in alp_py_map:
+            word_list.append(alp_py_map[each])
+        elif each in division_map:
+            word_list.append(division_map[each])
+    return word_list
+
+
+class Check:
+    def __init__(self):
+        # 记录读取到了多少个敏感词
+        self.word_cnt = 0
+        # 记录敏感词原型
+        self.original_word = []
+        # 记录敏感词的所有变形
+        self.sensitive_word = []
+
+    def read_words(self):
+        try:
+            with open(file_org, 'r+', encoding='utf-8') as org:
+                words = org.readlines()
+                for word in words:
+                    word = word.replace('\r', '').replace('\n', '')
+                    # 保存敏感词的原型
+                    self.original_word.append(word)
+                    # 获取敏感词的所有可能形态
+                    deformations = produce_words(word)
+                    # 将所有变形与数字集合建立映射关系，记录其对应第几个敏感词
+                    for deformation in deformations:
+                        self.sensitive_word.append([word2num(deformation), self.word_cnt])
+                    self.word_cnt += 1
+                # print(self.sensitive_word)
+        except OSError as reason:
+            print('敏感词文件出错了\n错误的原因是：' + str(reason))
+
+
 def main():
+    # try:
+    #     with open('./requirements.txt', 'r+', encoding='utf-8') as words:
+    #         lines = words.readlines()
+    #         for line in lines:
+    #             line = line.replace('\r', '').replace('\n', '')
+    #             for each in line:
+    #                 ChineseBreak.test(each)
+    # except OSError as reason:
+    #     print('文件出错了\n错误的原因是：' + str(reason))
     init_map()
-    try:
-        with open('./requirements.txt', 'r+', encoding='utf-8') as words:
-            lines = words.readlines()
-            for line in lines:
-                line = line.replace('\r', '').replace('\n', '')
-                produce_words(line)
-    except OSError as reason:
-        print('文件出错了\n错误的原因是：' + str(reason))
-    init_map()
+    checker = Check()
+    checker.read_words()
 
 
 if __name__ == '__main__':
