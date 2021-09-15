@@ -237,13 +237,23 @@ class Trie(object):
             else:
                 start_index = i
                 p = self.root
+            # if p is not self.root and p.tail:
+            #     global total
+            #     total += 1
+            #     rst.append([start_index, i+1, p.index])
             temp = p
             while temp is not self.root:
                 # 尾标志为0不处理，但是tail需要-1从而与敏感词字典下标一致
                 # 循环原因在于，有些词本身只是另一个词的后缀，也需要辨识出来
                 if temp.tail:
+                    pre = [-1, -1, -1]
+                    if len(rst) > 0:
+                        pre = rst[-1]
                     global total
-                    total += 1
+                    if temp.index != pre[2] or start_index != pre[0]:
+                        total += 1
+                    else:
+                        rst.pop()
                     rst.append([start_index, i+1, temp.index])
                     # rst[self.words[temp.tail - 1]].append((start_index, i))
                 temp = temp.fail
