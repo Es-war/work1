@@ -1,7 +1,9 @@
 import pypinyin
 import copy
 import re
+import sys
 
+# 枚举所有拼音、字母
 AL_PY = [
     'a', 'o', 'e', 'ba', 'bo', 'bi', 'bu', 'pa', 'po', 'pi', 'pu',
     'ma', 'mo', 'me', 'mi', 'mu', 'fa', 'fo', 'fu', 'da', 'de',
@@ -56,15 +58,20 @@ AL_PY = [
     'u', 'v', 'w', 'x', 'y', 'z'
 ]
 
-total = 0
-map_cnt = 0
+total = 0  # 统计答案个数
+map_cnt = 0  # 映射值
 alp_py_map = {}  # 字母、拼音映射表
 
-file_org = "./requirements.txt"
-file_org_add = "./org_add.txt"
-file_ans = "./ans.txt"
+# file_word = "./requirements.txt"
+# file_org_add = "./org_add.txt"
+# file_ans = "./ans.txt"
+
+file_word = sys.argv[1]
+file_org_add = sys.argv[2]
+file_ans = sys.argv[3]
 
 
+# 建立拼音、字母与数字的映射关系
 def init_map():
     global map_cnt
     for letter in AL_PY:
@@ -72,6 +79,7 @@ def init_map():
         alp_py_map[letter] = map_cnt
 
 
+# 生成敏感词的所有可能形式
 def produce_words(word):
     global map_cnt
     word = list(word)
@@ -118,8 +126,8 @@ def produce_words(word):
     return sensitive_word
 
 
+# 用数字表征敏感词
 def word2num(word):
-    # 用数字表征敏感词
     word_list = []
     for each in word:
         word_list.append(alp_py_map[each])
@@ -127,6 +135,7 @@ def word2num(word):
     return word_list
 
 
+# 表示树的节点
 class TrieNode(object):
     def __init__(self, value=None):
         # 值
@@ -141,6 +150,7 @@ class TrieNode(object):
         self.index = -1
 
 
+# 实现AC自动机
 class Trie(object):
     def __init__(self, words):
         # 根节点
@@ -152,12 +162,8 @@ class Trie(object):
             self.insert(word)
         self.ac_automation()
 
+    # 插入操作
     def insert(self, word):
-        """
-        基操，插入一个字符串
-        :param word: 字符串
-        :return:
-        """
         self.count += 1
         cur_node = self.root
         sequence = word[0]
@@ -173,11 +179,8 @@ class Trie(object):
         cur_node.tail = self.count
         cur_node.index = word[1]
 
+    # 构建失败路径
     def ac_automation(self):
-        """
-        构建失败路径
-        :return:
-        """
         queue = [self.root]
         # BFS遍历字典树
         while len(queue):
@@ -204,13 +207,8 @@ class Trie(object):
                 # 将当前结点的所有子结点加到队列中
                 queue.append(value)
 
+    # 传入待检测的某一行文本，找出该行内的所有敏感词
     def search(self, text):
-        """
-        模式匹配
-        :param self:
-        :param text: 长文本
-        :return:
-        """
         p = self.root
         # 记录匹配起始位置下标
         start_index = 0
@@ -260,6 +258,7 @@ class Trie(object):
         return rst
 
 
+# 处理待检测文本
 class Check:
     def __init__(self):
         # 记录读取到了多少个敏感词
@@ -273,9 +272,10 @@ class Check:
         # 记录每行检测出的敏感词
         self.result = []
 
+    # 读取敏感词
     def read_words(self):
         try:
-            with open(file_org, 'r+', encoding='utf-8') as org:
+            with open(file_word, 'r+', encoding='utf-8') as org:
                 words = org.readlines()
                 for word in words:
                     word = word.replace('\r', '').replace('\n', '')
@@ -295,11 +295,13 @@ class Check:
         except OSError as reason:
             print('敏感词文件出错了\n错误的原因是：' + str(reason))
 
+    # 读取待检测文本
     def read_org_add(self):
         try:
             with open(file_org_add, 'r+', encoding='utf-8') as org:
                 model = Trie(self.sensitive_word)
                 lines = org.readlines()
+                # 逐行处理待检测文本
                 for original_line in lines:
                     self.line_cnt += 1
                     original_line = original_line.replace('\r', '').replace('\n', '')
@@ -315,6 +317,7 @@ class Check:
         except OSError as reason:
             print('文本文件出错了\n错误的原因是：' + str(reason))
 
+    # 将结果输入输出文件内
     def output(self):
         try:
             with open(file_ans, 'w+', encoding='utf-8') as ans:
