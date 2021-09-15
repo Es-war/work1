@@ -1,4 +1,3 @@
-import ChineseBreak
 import pypinyin
 import copy
 
@@ -88,14 +87,6 @@ def produce_words(word):
             li.append(list(py))
             # 首字母
             li.append([py[0]])
-
-            # 判断是否可以拆分
-            if ChineseBreak.is_breakable(character):
-                sub_li = []
-                parts = ChineseBreak.get_part(character)
-                for part in parts:
-                    sub_li.append(pypinyin.lazy_pinyin(part)[0])
-                li.append(sub_li)
 
             word[index] = li
 
