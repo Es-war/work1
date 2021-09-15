@@ -58,7 +58,6 @@ AL_PY = [
 
 map_cnt = 0
 alp_py_map = {}  # 字母、拼音映射表
-division_map = {}   # 偏旁拆分映射表
 
 file_org = "./requirements.txt"
 file_org_add = "./org_add.txt"
@@ -70,8 +69,8 @@ def init_map():
     for letter in AL_PY:
         map_cnt += 1
         alp_py_map[letter] = map_cnt
-        
-        
+
+
 def produce_words(word):
     global map_cnt
     word = list(word)
@@ -95,10 +94,7 @@ def produce_words(word):
                 sub_li = []
                 parts = ChineseBreak.get_part(character)
                 for part in parts:
-                    if part not in division_map:
-                        map_cnt += 1
-                        division_map[part] = map_cnt
-                    sub_li.append(part)
+                    sub_li.append(pypinyin.lazy_pinyin(part)[0])
                 li.append(sub_li)
 
             word[index] = li
@@ -133,10 +129,8 @@ def word2num(word):
     # 用数字表征敏感词
     word_list = []
     for each in word:
-        if each in alp_py_map:
-            word_list.append(alp_py_map[each])
-        elif each in division_map:
-            word_list.append(division_map[each])
+        word_list.append(alp_py_map[each])
+    # print(word_list)
     return word_list
 
 
@@ -157,8 +151,11 @@ class Check:
                     word = word.replace('\r', '').replace('\n', '')
                     # 保存敏感词的原型
                     self.original_word.append(word)
+
+                    word.lower()
                     # 获取敏感词的所有可能形态
                     deformations = produce_words(word)
+                    # print("deformation:",deformations)
                     # 将所有变形与数字集合建立映射关系，记录其对应第几个敏感词
                     for deformation in deformations:
                         self.sensitive_word.append([word2num(deformation), self.word_cnt])
