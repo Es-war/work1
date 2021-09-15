@@ -291,6 +291,7 @@ class Check:
                         self.sensitive_word.append([word2num(deformation), self.word_cnt])
                     self.word_cnt += 1
                 # print(self.sensitive_word)
+                org.close()
         except OSError as reason:
             print('敏感词文件出错了\n错误的原因是：' + str(reason))
 
@@ -310,6 +311,7 @@ class Check:
                         self.result.append([self.line_cnt, self.original_word[each[2]], original_line[each[0]:each[1]]])
 
                 self.output()
+                org.close()
         except OSError as reason:
             print('文本文件出错了\n错误的原因是：' + str(reason))
 
@@ -320,6 +322,8 @@ class Check:
 
                 for i in self.result:
                     print('Line{}: <{}> {}'.format(i[0], i[1], i[2]), file=ans)
+
+                ans.close()
         except IOError as reason:
             print('输出文件出错了\n错误的原因是：' + str(reason))
 
