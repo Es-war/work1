@@ -62,7 +62,7 @@ AL_PY = [
 total = 0  # 统计答案个数
 map_cnt = 0  # 映射值
 alp_py_map = {}  # 字母、拼音映射表
-division_map = {}
+division_map = {}  # 汉字拆分映射表
 
 # file_word = "./requirements.txt"
 # file_org_add = "./org_add.txt"
@@ -310,6 +310,8 @@ class Check:
                     original_line = original_line.replace('\r', '').replace('\n', '')
                     line = re.sub(u'([^\u3400-\u4db5\u4e00-\u9fa5a-zA-Z])', '#', original_line)
                     line = line.lower()
+
+                    # 可拆分汉字
                     for index in range(len(line)-1):
                         character = (line[index], line[index+1])
                         if character in division_map:
