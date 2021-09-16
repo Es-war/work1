@@ -215,7 +215,7 @@ class Trie(object):
                 queue.append(value)
 
     # 传入待检测的某一行文本，找出该行内的所有敏感词
-    def search(self, text):
+    def search(self, text, original_text):
         p = self.root
         # 记录匹配起始位置下标
         start_index = 0
@@ -255,7 +255,10 @@ class Trie(object):
                         total += 1
                     else:
                         rst.pop()
-                    rst.append([start_index, i+1, temp.index])
+                    if text[i] != original_text[i]:
+                        rst.append([start_index, i+2, temp.index])
+                    else:
+                        rst.append([start_index, i+1, temp.index])
                     # rst[self.words[temp.tail - 1]].append((start_index, i))
                 temp = temp.fail
         return rst
@@ -320,7 +323,7 @@ class Check:
                             li[index+1] = '#'
                             line = ''.join(li)
                     # tmp_result:[ [起始位置，终点位置，对应原型], [] ]
-                    tmp_result = model.search(line)
+                    tmp_result = model.search(line, original_line.lower())
                     for each in tmp_result:
                         self.result.append([self.line_cnt, self.original_word[each[2]], original_line[each[0]:each[1]]])
 
