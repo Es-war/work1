@@ -256,9 +256,9 @@ class Trie(object):
                     else:
                         rst.pop()
                     if text[i] != original_text[i]:
-                        rst.append([start_index, i+2, temp.index])
+                        rst.append([start_index, i + 2, temp.index])
                     else:
-                        rst.append([start_index, i+1, temp.index])
+                        rst.append([start_index, i + 1, temp.index])
                     # rst[self.words[temp.tail - 1]].append((start_index, i))
                 temp = temp.fail
         return rst
@@ -279,9 +279,9 @@ class Check:
         self.result = []
 
     # 读取敏感词
-    def read_words(self):
+    def read_words(self, filename):
         try:
-            with open(file_word, 'r+', encoding='utf-8') as org:
+            with open(filename, 'r+', encoding='utf-8') as org:
                 words = org.readlines()
                 for word in words:
                     word = word.replace('\r', '').replace('\n', '')
@@ -302,9 +302,9 @@ class Check:
             print('敏感词文件出错了\n错误的原因是：' + str(reason))
 
     # 读取待检测文本
-    def read_org_add(self):
+    def read_org_add(self, file_name):
         try:
-            with open(file_org_add, 'r+', encoding='utf-8') as org:
+            with open(file_name, 'r+', encoding='utf-8') as org:
                 model = Trie(self.sensitive_word)
                 lines = org.readlines()
                 # 逐行处理待检测文本
@@ -315,27 +315,27 @@ class Check:
                     line = line.lower()
 
                     # 可拆分汉字
-                    for index in range(len(line)-1):
-                        character = (line[index], line[index+1])
+                    for index in range(len(line) - 1):
+                        character = (line[index], line[index + 1])
                         if character in division_map:
                             li = list(line)
                             li[index] = division_map[character]
-                            li[index+1] = '#'
+                            li[index + 1] = '#'
                             line = ''.join(li)
                     # tmp_result:[ [起始位置，终点位置，对应原型], [] ]
                     tmp_result = model.search(line, original_line.lower())
                     for each in tmp_result:
                         self.result.append([self.line_cnt, self.original_word[each[2]], original_line[each[0]:each[1]]])
 
-                self.output()
+                self.output(file_ans)
                 org.close()
         except OSError as reason:
             print('文本文件出错了\n错误的原因是：' + str(reason))
 
     # 将结果输入输出文件内
-    def output(self):
+    def output(self, filename):
         try:
-            with open(file_ans, 'w+', encoding='utf-8') as ans:
+            with open(filename, 'w+', encoding='utf-8') as ans:
                 print("Total: {}".format(total), file=ans)
 
                 for i in self.result:
@@ -349,8 +349,8 @@ class Check:
 def main():
     init_map()
     checker = Check()
-    checker.read_words()
-    checker.read_org_add()
+    checker.read_words(file_word)
+    checker.read_org_add(file_org_add)
 
 
 if __name__ == '__main__':
