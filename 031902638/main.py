@@ -2,6 +2,7 @@ import pypinyin
 import copy
 import re
 import sys
+import ChineseBreak
 
 # 枚举所有拼音、字母
 AL_PY = [
@@ -61,6 +62,7 @@ AL_PY = [
 total = 0  # 统计答案个数
 map_cnt = 0  # 映射值
 alp_py_map = {}  # 字母、拼音映射表
+division_map = {}
 
 # file_word = "./requirements.txt"
 # file_org_add = "./org_add.txt"
@@ -99,6 +101,11 @@ def produce_words(word):
             li.append([py[0]])
 
             word[index] = li
+
+            # 判断拆分
+            if ChineseBreak.is_breakable(character):
+                parts = ChineseBreak.get_part(character)
+                division_map[parts] = character
 
     sensitive_word = []
     for character in word:
@@ -235,10 +242,6 @@ class Trie(object):
             else:
                 start_index = i
                 p = self.root
-            # if p is not self.root and p.tail:
-            #     global total
-            #     total += 1
-            #     rst.append([start_index, i+1, p.index])
             temp = p
             while temp is not self.root:
                 # 尾标志为0不处理，但是tail需要-1从而与敏感词字典下标一致
@@ -307,6 +310,13 @@ class Check:
                     original_line = original_line.replace('\r', '').replace('\n', '')
                     line = re.sub(u'([^\u3400-\u4db5\u4e00-\u9fa5a-zA-Z])', '#', original_line)
                     line = line.lower()
+                    for index in range(len(line)-1):
+                        character = (line[index], line[index+1])
+                        if character in division_map:
+                            li = list(line)
+                            li[index] = division_map[character]
+                            li[index+1] = '#'
+                            line = ''.join(li)
                     # tmp_result:[ [起始位置，终点位置，对应原型], [] ]
                     tmp_result = model.search(line)
                     for each in tmp_result:
