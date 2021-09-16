@@ -1699,10 +1699,3 @@ def get_part(c):
         return BREAKER_MAP[c]
     else:
         return None
-
-
-def test(c):
-    if is_breakable(c):
-        print(c, "可拆分，拆分结果为：", get_part(c))
-    else:
-        print(c, "不可拆分")
