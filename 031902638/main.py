@@ -64,7 +64,7 @@ map_cnt = 0  # 映射值
 alp_py_map = {}  # 字母、拼音映射表
 division_map = {}  # 汉字拆分映射表
 
-# file_word = "./requirements.txt"
+# file_word = "./org.txt"
 # file_org_add = "./org_add.txt"
 # file_ans = "./ans.txt"
 
@@ -326,8 +326,6 @@ class Check:
                     tmp_result = model.search(line, original_line.lower())
                     for each in tmp_result:
                         self.result.append([self.line_cnt, self.original_word[each[2]], original_line[each[0]:each[1]]])
-
-                self.output(file_ans)
                 org.close()
         except OSError as reason:
             print('文本文件出错了\n错误的原因是：' + str(reason))
@@ -351,6 +349,7 @@ def main():
     checker = Check()
     checker.read_words(file_word)
     checker.read_org_add(file_org_add)
+    checker.output(file_ans)
 
 
 if __name__ == '__main__':
