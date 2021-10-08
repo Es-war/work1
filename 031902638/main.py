@@ -54,7 +54,7 @@ AL_PY = [
     'xiong', 'xuan', 'zhua', 'zhuo', 'zhuai', 'zhuan', 'zhuang',
     'chua', 'chuo', 'chuai', 'chuan', 'chuang', 'shua', 'shuo',
     'shuai', 'shuan', 'shuang', 'rua', 'ruo', 'ruan', 'zuo',
-    'zuan', 'cuo', 'cuan', 'suo', 'suan', 'yuan', 'b', 'c', 'd', 'f',
+    'zuan', 'cuo', 'cuan', 'suo', 'suan', 'yuan', 'nve', 'lve', 'b', 'c', 'd', 'f',
     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't',
     'u', 'v', 'w', 'x', 'y', 'z'
 ]
@@ -63,10 +63,6 @@ total = 0  # 统计答案个数
 map_cnt = 0  # 映射值
 alp_py_map = {}  # 字母、拼音映射表
 division_map = {}  # 汉字拆分映射表
-
-# file_word = "./org.txt"
-# file_org_add = "./org_add.txt"
-# file_ans = "./ans.txt"
 
 file_word = sys.argv[1]
 file_org_add = sys.argv[2]
